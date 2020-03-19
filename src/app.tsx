@@ -46,7 +46,7 @@ async function main() {
 
     let res = await SerializationUtil.getAndCheckStoredSession();
     if (res == undefined) {
-        //navigateToLogin();
+        navigateToLogin();
         return;
     }
 

@@ -33,7 +33,7 @@ function loginComplete(api: IHopperApi) {
         document.location.assign(redirect);
         return;
     }
-    //document.location.assign("/app");
+    document.location.assign("/app");
 }
 
 async function main() {
