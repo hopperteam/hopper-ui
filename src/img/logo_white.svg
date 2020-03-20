@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="417mm" height="160mm" version="1.1" viewBox="0 0 417 160" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <defs>
+  <clipPath id="clipPath1117">
+   <path d="m87.621 15.555-11.994 10.289-6.3525 83.147 136.98 31.956 234.42-21.898-7.1486-95.729z" fill="none" stroke="#000" stroke-width=".26458px"/>
+  </clipPath>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <path d="m9.1242 12.299 40 40v50l10 20v-70l40-40" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4.365"/>
+ <text transform="matrix(.93258 0 0 1.0723 9.1242 12.299)" x="68.840332" y="103.52544" clip-path="url(#clipPath1117)" fill="#ffffff" font-family="Raleway" font-size="11.74px" font-weight="300" letter-spacing="-6.6146px" stroke-width=".29351" style="line-height:1.25" xml:space="preserve"><tspan x="68.840332" y="103.52544" fill="#ffffff" font-family="Raleway" font-size="119.19px" font-weight="300" letter-spacing="-6.6146px" stroke-width=".29351">hopper</tspan></text>
+</svg>

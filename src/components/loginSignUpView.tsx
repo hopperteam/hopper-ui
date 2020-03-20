@@ -26,8 +26,8 @@ export default class LoginSignUpView extends React.Component<LoginSignUpViewProp
     render(): React.ReactNode {
         return <div id="loginSignUpTabbedView">
             <div id="loginSignUpTabs">
-                <button id="loginTab" onClick={ () => this.setState({onLoginScreen: true}) }>Login</button>
-                <button id="signUpTab" onClick={ () => this.setState({onLoginScreen: false}) }>Sign Up</button>
+            <button id="loginTab" onClick={ () => this.setState({onLoginScreen: true}) } className={(this.state.onLoginScreen) ? "active" : ""}>Login</button>
+                <button id="signUpTab" onClick={ () => this.setState({onLoginScreen: false}) } className={(!this.state.onLoginScreen) ? "active" : ""}>Sign Up</button>
             </div>
             {
                 (this.state.onLoginScreen) ? <LoginView onLoggedIn={this.props.onLoggedIn} api={this.props.api} /> : <SignUpView onLoggedIn={this.props.onLoggedIn} api={this.props.api} />

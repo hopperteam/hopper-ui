@@ -155,6 +155,7 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
                                     alt={x.subscription.app.name + " (" + x.notifications + ")"}
                                     onClick={() => this.onSubscriptionClick(x.subscription.id)}
                                     id={"app-" + x.subscription.id}
+                                    key={x.subscription.id}
                                     className={x.subscription.id == this.props.currentSubscription ? "appFilter appFilterSelected" : "appFilter"} />;
                     })
             }
