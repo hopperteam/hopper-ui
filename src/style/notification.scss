@@ -2,11 +2,58 @@
 
 .notification {
     margin: 16px;
-    box-shadow: 0 0 5px 0 #000000;
     border-radius: 2px;
     font-size: 1rem;
+    position: relative;
+}
+
+.notificationBackground {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.notification.markingDone {
+    background: $hopperGreen
+}
+
+.notification.markingDone .notificationBackground {
+    background: url("./../img/mark_done.svg") no-repeat;
+    background-size: contain;
+    background-position-x: left;
+}
+
+.notification.markingUndone {
+    background: orange;
+}
+
+.notification.markingUndone .notificationBackground {
+    background: url("./../img/mark_undone.svg") no-repeat;
+    background-size: contain;
+    background-position-x: left;
+}
+
+.notification.deleting {
+    background: red;
+}
+
+.notification.deleting .notificationBackground {
+    background: url("./../img/delete.svg") no-repeat;
+    background-size: contain;
+    background-position-x: right;
+}
+
+.notificationElement {
+    border-radius: 2px;
+    box-shadow: 0 0 5px 0 #000000;
     padding: 4px 0 0;
     background: white;
+}
+
+.notification.done .notificationElement {
+    background: #ddd;
 }
 
 .notificationTitle {
