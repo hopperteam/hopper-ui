@@ -139,27 +139,34 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
                  onTouchMove={this.touchMove.bind(this)}
                  onTouchEnd={this.touchEnd.bind(this)}
                 style={{transform: `translateX(${this.state.dragX}px)`}}>
-                <div className="notificationMeta">
-                    <span className="notificationSender">{this.props.subscription.app.name}</span>
-                    <div className="notificationSenderSeparator" />
-                    <span className="notificationTime">{getTimeText(this.props.notification.timestamp)}</span>
+                <div className="notificationLeftBox" >
+                    <div className="notificationMeta">
+                        <span className="notificationSender">{this.props.subscription.app.name}</span>
+                        <div className="notificationSenderSeparator" />
+                        <span className="notificationTime">{getTimeText(this.props.notification.timestamp)}</span>
+                    </div>
+                    <div className="notificationContent">
+                        <img className="notificationImage" alt="notificationImage" src={
+                            this.props.notification.imageUrl != undefined ? this.props.notification.imageUrl : this.props.subscription.app.imageUrl}
+                        />
+                        <div className="notificationTextContent">
+                            <p className="notificationTitle">{this.props.notification.heading}</p>
+                            <div className="notificationBody">
+                                {(this.props.notification.content as string).split("\n")
+                                    .map((line, key) => {
+                                        return <span key={key}>
+                                                    {line}
+                                                    <br />
+                                               </span>
+                                    })}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button className={!this.props.notification.isDone ? "markDoneButton" : "markUndoneButton"}
-                        onClick={ this.toggleDone.bind(this) } />
-                <button className="deleteButton" onClick={ this.delete.bind(this) }>Delete</button>
-                <div className="notificationContent">
-                    <img className="notificationImage" alt="notificationImage" src={
-                        this.props.notification.imageUrl != undefined ? this.props.notification.imageUrl : this.props.subscription.app.imageUrl}
-                    />
-                    <p className="notificationTitle">{this.props.notification.heading}</p>
-                    <div className="notificationBody">
-                        {(this.props.notification.content as string).split("\n")
-                            .map((line, key) => {
-                                return <span key={key}>
-                            {line}
-                            <br />
-                        </span>
-                            })}
+                <div className="notificationRightBox">
+                    <div className="notificationButtons">
+                        <div className="deleteButton" onClick={ this.delete.bind(this) } />
+                        <div className={"doneToggleButton " + (!this.props.notification.isDone ? "markDoneButton" : "markUndoneButton") } onClick={ this.toggleDone.bind(this) } />
                     </div>
                 </div>
             </div>

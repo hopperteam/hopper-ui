@@ -50,6 +50,8 @@
     box-shadow: 0 0 5px 0 #000000;
     padding: 4px 0 0;
     background: white;
+    display: flex;
+    align-items: center;
 }
 
 .notification.done .notificationElement {
@@ -58,7 +60,8 @@
 
 .notificationTitle {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
 .notificationImage {
@@ -69,6 +72,7 @@
 }
 
 .notificationBody {
+    font-size: .9rem;
     /*margin-top: 2px;*/
 }
 
@@ -98,6 +102,7 @@
 }
 
 .notificationContent {
+    display: flex;
     padding: 0 8px 8px;
 }
 
@@ -119,6 +124,58 @@
     width: 3rem;
 }
 
+
+
+.notificationTextContent {
+    flex-grow: 1;
+}
+
+.notificationLeftBox {
+    flex-grow: 1;
+}
+
+.notificationRightBox {
+    height: 100%;
+    flex: 0 0 4rem;
+    flex-direction: row;
+    position: relative;
+
+}
+
+.notificationButtons {
+    flex: 0 0 5rem;
+    display: flex;
+    height: 2rem;
+    padding: 8px;
+}
+
+.doneToggleButton {
+    cursor: pointer;
+    flex-grow: 3;
+    height: 100%;
+    margin-left: 4px;
+}
+
 .markDoneButton {
-    margin-left: 16px;
+    background: url("./../img/mark_done_black.svg") no-repeat center;
+    background-size: contain;
+
+}
+
+.markUndoneButton {
+    background: url("./../img/mark_undone_black.svg") no-repeat center;
+    background-size: contain;
+}
+
+.deleteButton {
+    background: url("./../img/delete_black.svg") no-repeat center;
+    background-size: contain;
+    cursor: pointer;
+    flex-grow: 1;
+    height: 100%;
+    transition: flex-grow .1s;
+}
+
+.deleteButton:hover {
+    flex-grow: 10;
 }
