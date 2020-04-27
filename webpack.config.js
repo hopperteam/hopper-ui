@@ -31,6 +31,7 @@ module.exports = {
     output: {
         path: __dirname + '/.build',
         filename: '[name].bundle.js',
+        publicPath: "/"
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],

@@ -147,8 +147,8 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
                     </div>
                     <div className="notificationContent">
                         <img className="notificationImage" alt="notificationImage" src={
-                            this.props.notification.imageUrl != undefined ? this.props.notification.imageUrl : this.props.subscription.app.imageUrl}
-                         onError={evt => evt.currentTarget.src = require('img/unknown_app.svg') }
+                                this.props.notification.imageUrl != undefined ? this.props.notification.imageUrl : this.props.subscription.app.imageUrl}
+                            onError={evt => { evt.currentTarget.onerror = () => {}; evt.currentTarget.src = require('img/unknown_app.svg')} }
                         />
                         <div className="notificationTextContent">
                             <p className="notificationTitle">{this.props.notification.heading}</p>
