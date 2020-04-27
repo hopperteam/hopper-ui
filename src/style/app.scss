@@ -49,18 +49,12 @@ html {
 }
 
 #notificationContainer {
-    padding-top: 8px;
     overflow-y: scroll;
     overflow-x: hidden;
     width: 100%;
     @include gridRootHor;
     grid-template-rows: 4em 1fr;
-}
-
-#notificationFilterChooser {
-    @include gridFillHor;
-    @include gridRow(1, 2);
-    overflow-x: auto;
+    flex-grow: 1;
 }
 
 #notificationList {
