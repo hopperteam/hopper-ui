@@ -1,0 +1,123 @@
+@import "res";
+@import "grid";
+
+#root {
+  @include gridRootHor;
+  @include gridRootVert;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  @media ($nonMobileLayout) {
+    background-image: url("./../img/background/bg-1920.jpg");
+
+    @media (min-width: 2000px) {
+      background-image: url("./../img/background/bg-6000.jpg");
+    }
+  }
+}
+
+#loginSignUpTabbedView {
+  @include gridGlobalCenterHor;
+  @include gridGlobalCenterVert;
+
+  @media ($nonMobileLayout) {
+    //border: 1px solid black;
+    box-shadow: 0 0 15px 0 #000000;
+    border-radius: 4px;
+  }
+
+  background: white;
+
+  @include gridRootVert;
+  @include gridRootHor;
+  overflow: hidden;
+}
+
+#loginSignUpTabbedView::before {
+  @include gridRow(1,4);
+  @include gridFillHor;
+  content: '';
+  background-image: url("./../img/logo_white.svg"), $hopperGrad;
+  height: 100%;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding: 20px;
+  background-origin: content-box, border-box;
+  box-sizing: border-box;
+}
+
+#loginSignUpTabs {
+  @include gridCenterHor(1);
+  @include gridRow(4, 6);
+}
+
+#loginView {
+  @include gridFillHor;
+  @include gridRow(6, 13);
+}
+
+#loginView > form {
+  @include gridRootHor;
+  @include gridRootVertCustom(7);
+}
+
+#loginView > form > input {
+  @include gridCenterHor(1);
+  margin: 4px;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 8px;
+  outline: none;
+  transition: border-bottom-color .1s, border-left-color .1s, border-top-color .1s, border-right-color .1s;
+}
+
+#loginView > form > input:focus {
+  border: 1px solid $hopperGreen;
+}
+
+#loginView > form > input[type="submit"] {
+  border: none;
+  background-color: $hopperGreen;
+  cursor: pointer;
+  transition: background-color .1s;
+}
+
+#loginView > form > input[type="submit"]:hover {
+  background-color: darken($hopperGreen, 10);
+}
+
+#loginFailed {
+  @include gridCenterHor(1);
+}
+
+#loginSignUpTabs {
+  @include gridRootHorCustom(2);
+}
+
+
+#loginTab {
+  @include gridColumn(1,1)
+}
+
+#signUpTab {
+  @include gridColumn(2,2)
+}
+
+#loginSignUpTabs > button {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .8em;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+#loginSignUpTabs > button.active {
+  text-decoration: underline;
+  font-weight: 800;
+  color: $hopperGreen
+}

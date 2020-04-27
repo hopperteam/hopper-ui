@@ -1,16 +1,68 @@
 @import "res";
+@import "grid";
 
 .notification {
     margin: 16px;
-    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.75);
-    border-radius: 4px;
+    border-radius: 2px;
     font-size: 1rem;
+    position: relative;
+}
+
+.notificationBackground {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.notification.markingDone {
+    background: $hopperGreen
+}
+
+.notification.markingDone .notificationBackground {
+    background: url("./../img/mark_done.svg") no-repeat;
+    background-size: contain;
+    background-position-x: left;
+}
+
+.notification.markingUndone {
+    background: orange;
+}
+
+.notification.markingUndone .notificationBackground {
+    background: url("./../img/mark_undone.svg") no-repeat;
+    background-size: contain;
+    background-position-x: left;
+}
+
+.notification.deleting {
+    background: red;
+}
+
+.notification.deleting .notificationBackground {
+    background: url("./../img/delete.svg") no-repeat;
+    background-size: contain;
+    background-position-x: right;
+}
+
+.notificationElement {
+    border-radius: 2px;
+    box-shadow: 0 0 5px 0 #000000;
     padding: 4px 0 0;
+    background: white;
+    display: flex;
+    align-items: center;
+}
+
+.notification.done .notificationElement {
+    background: #ddd;
 }
 
 .notificationTitle {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
 }
 
 .notificationImage {
@@ -21,6 +73,7 @@
 }
 
 .notificationBody {
+    font-size: .9rem;
     /*margin-top: 2px;*/
 }
 
@@ -50,30 +103,156 @@
 }
 
 .notificationContent {
+    display: flex;
     padding: 0 8px 8px;
 }
 
 #notificationFilterChooser {
-    overflow-x: scroll;
+    @include gridFillHor;
+    @include gridRow(1, 2);
+    overflow-x: auto;
+    background: white;
+    box-shadow: 0 0 5px 0 #000000;
+    padding: 8px 8px 0;
+    z-index: 2;
 }
 
 .appFilter {
     height: 3rem;
     width: 3rem;
     margin-left: 8px;
-    float: left;
+    cursor: pointer;
 }
 
-.appFilterSelected {
-    border: 2px solid $hopperGreen;
+.appFilterNotSelected {
+    filter: grayscale(100%) opacity(50%);
+}
+
+#appLabels {
+    display: inline-block;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: calc(100% - 4rem - 60px);
+    height: 3rem;
+    white-space: nowrap;
 }
 
 #includeDoneSelector {
+    display: none;
+}
+
+#includeDoneSelectorLabel {
     float: left;
+    height: 2rem;
+    margin-top: .5rem;
+    width: 6rem;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 0 3px 0 #000000;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+#includeDoneSelectorLabel::before {
+    content: "";
+    float: left;
+    background: $hopperGreen;
+    height: 100%;
+    width: 2rem;
+}
+
+#includeDoneSelector:checked + #includeDoneSelectorLabel:before {
+    float: right;
+    background: $hopperGreenDark;
+}
+
+#includeDoneSelectorLabel::after {
+    float: right;
+    height: 100%;
+    width: 4rem;
+    text-align: center;
+    line-height: 2rem;
+    content: "OPEN";
+    color: #222;
+    font-size: .7rem;
+}
+
+#includeDoneSelector:checked + #includeDoneSelectorLabel:after {
+    float: left;
+    content: "ALL"
+}
+
+#selectorSeparator {
+    content: "";
     height: 3rem;
-    width: 3rem;
+    margin-top: 0;
+    float: left;
+    background-color: #444;
+    opacity: 80%;
+    width: 1px;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.notificationTextContent {
+    flex-grow: 1;
+}
+
+.notificationLeftBox {
+    flex-grow: 1;
+}
+
+.notificationRightBox {
+    height: 100%;
+    flex: 0 0 5rem;
+    flex-direction: row;
+    position: relative;
+
+}
+
+.notificationButtons {
+    flex: 0 0 5rem;
+    display: flex;
+    height: 2rem;
+    padding: 8px;
+}
+
+.doneToggleButton {
+    cursor: pointer;
+    flex-grow: 3;
+    height: 100%;
 }
 
 .markDoneButton {
-    margin-left: 16px;
+    background: url("./../img/mark_done_black.svg") no-repeat center;
+    background-size: contain;
+
+}
+
+.markUndoneButton {
+    background: url("./../img/mark_undone_black.svg") no-repeat center;
+    background-size: contain;
+}
+
+.deleteButton {
+    background: url("./../img/delete_black.svg") no-repeat center;
+    background-size: contain;
+    cursor: pointer;
+    flex-grow: 1;
+    height: 100%;
+    transition: flex-grow .1s;
+}
+
+.deleteButton:hover {
+    flex-grow: 10;
+}
+
+.buttonSeparator {
+    height: 1rem;
+    width: 1px;
+    margin-top: .5rem;
+    background-color: #444444;
+    margin-left: 8px;
+    margin-right: 8px;
+    content: "";
 }

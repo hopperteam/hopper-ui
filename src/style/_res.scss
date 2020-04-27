@@ -1,1 +1,12 @@
 $hopperGreen: #00bd84;
+$hopperGreenDark: #25664C;
+$hopperGradStart: #00c08a;
+$hopperGradEnd: #00ca9a;
+
+$hopperGrad: linear-gradient(to right, $hopperGradStart, $hopperGradEnd);
+
+@import url('https://fonts.googleapis.com/css?family=Muli:300,400,500,600,700,800&display=swap');
+
+* {
+  font-family: 'Muli', sans-serif;
+}

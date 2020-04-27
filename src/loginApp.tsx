@@ -8,6 +8,7 @@ import SerializationUtil from "serializationUtil";
 import {HopperApi, IHopperApi} from "./api/hopperApi";
 import {HopperUtil} from "./hopperUtil";
 import LoginSignUpView from "./components/loginSignUpView";
+import "style/login.scss";
 
 function renderLoadingView() {
     ReactDOM.render(

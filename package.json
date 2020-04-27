@@ -11,27 +11,27 @@
   "license": "ISC",
   "homepage": "https://hoppercloud.net",
   "devDependencies": {
-    "@types/js-cookie": "^2.2.4",
-    "@types/react": "^16.9.15",
-    "@types/react-dom": "^16.9.4",
+    "@types/js-cookie": "^2.2.6",
+    "@types/react": "^16.9.34",
+    "@types/react-dom": "^16.9.6",
     "clean-webpack-plugin": "^3.0.0",
-    "css-loader": "^3.2.1",
+    "css-loader": "^3.5.3",
     "cucumber": "^6.0.5",
     "file-loader": "^4.3.0",
     "html-webpack-plugin": "^3.2.0",
-    "node-sass": "^4.13.1",
-    "sass": "^1.23.7",
-    "sass-loader": "^8.0.0",
-    "style-loader": "^1.0.1",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.3",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10",
+    "node-sass": "^4.14.0",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.2.0",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
     "js-cookie": "^2.2.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   }
 }
