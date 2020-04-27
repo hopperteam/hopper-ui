@@ -161,6 +161,7 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
                                     onClick={() => this.onSubscriptionClick(x.subscription.id)}
                                     id={"app-" + x.subscription.id}
                                     key={x.subscription.id}
+                                    onError={evt => evt.currentTarget.src = require('img/unknown_app.svg') }
                                     className={"appFilter " + (this.props.currentSubscription !== undefined && this.props.currentSubscription !== x.subscription.id ? "appFilterNotSelected" : "") } />;
                     })
             }
