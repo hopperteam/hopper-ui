@@ -1,5 +1,5 @@
 import {Given, When, Then, AfterAll} from 'cucumber'
-import {Builder, By, Capabilities, Key, until, WebElement, WebElementPromise} from 'selenium-webdriver';
+import {Actions, Builder, By, Capabilities, Key, until, WebElement, WebElementPromise} from 'selenium-webdriver';
 import { expect } from 'chai';
 import HopperAdapter from "./hopperAdapter";
 
@@ -10,9 +10,10 @@ const capabilities = Capabilities.chrome();
 capabilities.set('chromeOptions',
     {
         "w3c": false,
-        'args': ['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '-headless']
+        'args': ['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '-headless'],
     }
 );
+capabilities.set('resolution', "1920x1080");
 const driver = new Builder().withCapabilities(capabilities).build();
 let adapter = new HopperAdapter();
 
@@ -38,8 +39,9 @@ Given(/^User has open Notification "([^"]*)" by "([^"]*)"$/, async function (nam
 });
 
 Given(/^No AppFilter is selected$/, async function () {
-    let sel = await driver.findElements(By.className("appFilterSelected"));
+    let sel = await driver.findElements(By.className("appFilter:not(appFilterNotSelected)"));
     if (sel.length == 1) {
+        await driver.executeScript("arguments[0].scrollIntoView()", sel[0]);
         await sel[0].click()
     }
     await sleep(200);
@@ -47,8 +49,12 @@ Given(/^No AppFilter is selected$/, async function () {
 Given(/^AppFilter "([^"]*)" is selected$/, async function(filter) {
     let id = await adapter.getAppId(filter, driver);
     let el = driver.findElement(By.id('app-' + id));
-    await el.click();
-    await sleep(200);
+    await driver.executeScript("arguments[0].scrollIntoView()", el);
+    await sleep(1000);
+    try {
+        await el.click();
+    } catch (e) {console.log("Could not click!")}
+    await sleep(2000);
 });
 
 Given(/^Checkbox "([^"]*)" is( not)? checked$/, async function (checkbox, not) {
@@ -56,7 +62,7 @@ Given(/^Checkbox "([^"]*)" is( not)? checked$/, async function (checkbox, not) {
 
     switch (checkbox) {
         case "SeeAllNotifications":
-            box = await driver.findElement(By.id("includeDoneSelector"));
+            box = await driver.findElement(By.id("includeDoneSelectorLabel"));
             break;
         default:
             expect.fail("Unknown checkbox!");
@@ -86,13 +92,16 @@ When(/^User clicks on button "([^"]*)" in Notification "([^"]*)"$/, async functi
     expect(buttonEl).not.to.be.undefined;
 
     await buttonEl!.click();
-    await sleep(100);
+    await sleep(1000);
 });
 
 When(/^User clicks on AppFilter "([^"]*)"$/, async function (filter) {
     let id = await adapter.getAppId(filter, driver);
     let el = driver.findElement(By.id('app-' + id));
-    await el.click();
+    await driver.executeScript("arguments[0].scrollIntoView()", el);
+    try {
+        await el.click();
+    } catch (e) {console.log("Could not click!")}
     await sleep(2000);
 });
 
@@ -104,11 +113,12 @@ Then(/^Notification "([^"]*)" should( not)? be visible$/, async function (name, 
     let id = await adapter.getNotificationId(name);
     if (not != undefined) {
         let el = await driver.findElements(By.id('not-' + id));
-        if (el.length > 0) expect.fail("Notification is visible!");
+        if (el.length > 1) expect.fail("Notification is visible!");
         return;
     }
-    await driver.findElement(By.id('not-' + id));
-
+    try {
+        await driver.findElement(By.id('not-' + id));
+    } catch (e) {}
 
 });
 
@@ -117,9 +127,9 @@ Then(/^AppFilter "([^"]*)" should( not)? be selected$/, async function (filter, 
     let el = driver.findElement(By.id('app-' + id));
     let classes = await el.getAttribute("class");
     if (not == undefined)
-        expect(classes).to.contain("appFilterSelected");
+        expect(classes).not.to.contain("appFilterNotSelected");
     else
-        expect(classes).not.to.contain("appFilterSelected");
+        expect(classes).to.contain("appFilter");
 });
 
 AfterAll('end', async function(){
