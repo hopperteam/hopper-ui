@@ -149,6 +149,7 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
             <input type="checkbox" onChange={this.onIncludeDoneChange.bind(this)} checked={this.props.includeDone} id="includeDoneSelector"/>
             <label id="includeDoneSelectorLabel" htmlFor="includeDoneSelector" />
             <div id="selectorSeparator" />
+            <div id="appLabels">
             {
                 Object.keys(this.props.notifications.subscriptionCategories)
                     .map(subscriptionId => {
@@ -165,6 +166,7 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
                                     className={"appFilter " + (this.props.currentSubscription !== undefined && this.props.currentSubscription !== x.subscription.id ? "appFilterNotSelected" : "") } />;
                     })
             }
+            </div>
         </div>
     }
 }

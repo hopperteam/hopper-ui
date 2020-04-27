@@ -121,12 +121,20 @@
     height: 3rem;
     width: 3rem;
     margin-left: 8px;
-    float: left;
     cursor: pointer;
 }
 
 .appFilterNotSelected {
     filter: grayscale(100%) opacity(50%);
+}
+
+#appLabels {
+    display: inline-block;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: calc(100% - 4rem - 60px);
+    height: 3rem;
+    white-space: nowrap;
 }
 
 #includeDoneSelector {
