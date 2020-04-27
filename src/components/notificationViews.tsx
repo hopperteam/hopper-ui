@@ -167,6 +167,7 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
                 <div className="notificationRightBox">
                     <div className="notificationButtons">
                         <div className="deleteButton" onClick={ this.delete.bind(this) } />
+                        <div className="buttonSeparator" />
                         <div className={"doneToggleButton " + (!this.props.notification.isDone ? "markDoneButton" : "markUndoneButton") } onClick={ this.toggleDone.bind(this) } />
                     </div>
                 </div>

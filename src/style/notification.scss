@@ -204,7 +204,7 @@
 
 .notificationRightBox {
     height: 100%;
-    flex: 0 0 4rem;
+    flex: 0 0 5rem;
     flex-direction: row;
     position: relative;
 
@@ -221,7 +221,6 @@
     cursor: pointer;
     flex-grow: 3;
     height: 100%;
-    margin-left: 8px;
 }
 
 .markDoneButton {
@@ -246,4 +245,14 @@
 
 .deleteButton:hover {
     flex-grow: 10;
+}
+
+.buttonSeparator {
+    height: 1rem;
+    width: 1px;
+    margin-top: .5rem;
+    background-color: #444444;
+    margin-left: 8px;
+    margin-right: 8px;
+    content: "";
 }
