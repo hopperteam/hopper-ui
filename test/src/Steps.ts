@@ -28,6 +28,7 @@ Given(/^User is on hopper$/, async function () {
 });
 
 Given(/^User is logged in$/, async function () {
+    await driver.wait(until.elementLocated(By.id('notificationContainer')), 2 * 1000);
     adapter = new HopperAdapter();
     await adapter.setup(driver);
 });
