@@ -5,7 +5,6 @@ const path = require('path');
 module.exports = {
     entry: {
         app: './src/app.tsx',
-        login: './src/loginApp.tsx',
         subscribe: './src/subscribeApp.tsx',
     },
     plugins: [
@@ -14,13 +13,8 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: 'src/templates/index.html',
-            filename: 'app/index.html',
-            chunks: ['app']
-        }),
-        new HtmlWebpackPlugin({
-            template: 'src/templates/index.html',
             filename: 'index.html',
-            chunks: ['login']
+            chunks: ['app']
         }),
         new HtmlWebpackPlugin({
             template: 'src/templates/index.html',

@@ -1,10 +1,16 @@
 import {App, Notification, SubscribeRequest, Subscription, User} from "types";
 import ApiBase from "api/restfulApi";
 
+export type HopperError = number;
+export const ERROR_UNAUTHENTICATED = 1;
+export const ERROR_NO_PERMISSION = 2;
+
+export function isHopperError(v: any): v is HopperError {
+    return v === ERROR_UNAUTHENTICATED || v === ERROR_NO_PERMISSION;
+}
+
 export interface IHopperApi {
-    login(email: string, password: string): Promise<boolean>
-    register(email: string, password: string, firstName: string, lastName: string): Promise<[boolean, string]>
-    getCurrentUser(): Promise<User|undefined>
+    getCurrentUser(): Promise<User|HopperError>
 
     getSubscriptions(): Promise<Subscription[]>
     getNotifications(includeDone: boolean, subscription: string|undefined, offset: number, limit: number): Promise<Notification[]>
@@ -18,61 +24,40 @@ export interface IHopperApi {
 
 export class HopperApi extends ApiBase implements IHopperApi {
 
-    static async createApi(): Promise<HopperApi> {
-        let url = await new Promise<string>(resolve => {
+    static instanceLoginUrl: string = "";
+    static instanceApiRot: string = "";
+
+    static loadInfo() {
+        return new Promise((resolve: any) => {
             let xhr = new XMLHttpRequest();
             xhr.open('GET', '/instance.json', true);
             xhr.onload = () => {
                 try {
-                    resolve(JSON.parse(xhr.responseText).apiRoot);
+                    let info = JSON.parse(xhr.responseText);
+                    this.instanceLoginUrl = info.loginUrl
+                    this.instanceApiRot = info.apiRoot
+                    resolve();
                 } catch (e) {
-                    resolve('/api/v1');
+                    resolve();
                 }
             };
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.send();
         });
-        return new HopperApi(url, "");
+    }
+
+    static createApi(token: string): HopperApi {
+        return new HopperApi(this.instanceApiRot, token);
     }
 
     constructor(apiPath: string, bearerToken: string) {
         super(apiPath, bearerToken);
     }
 
-    async login(email: string, password: string): Promise<boolean> {
-        let res = await this.post("/login", {
-            "email": email,
-            "password": password
-        });
-
-        if (!(res.status == 200 && res.result.status == "success")) {
-            return false;
-        }
-        this.apiBearerToken = res.result.token;
-        return true;
-    }
-
-    async register(email: string, password: string, firstName: string, lastName: string): Promise<[boolean, string]> {
-        let res = await this.post("/register", {
-            "email": email,
-            "password": password,
-            "firstName": firstName,
-            "lastName": lastName
-        });
-
-        let success =  res.status == 200 && res.result.status == "success";
-        let error = "";
-        if (success) {
-            this.apiBearerToken = res.result.token;
-        } else if (!success && res.resultParsable) {
-            error = res.result.reason;
-        }
-        return [success, error]
-    }
-
-    async getCurrentUser(): Promise<User|undefined> {
+    async getCurrentUser(): Promise<User|HopperError> {
         let resp = await this.get("/user");
-        if (resp.status != 200) return undefined;
+        if (resp.status == 403) return ERROR_NO_PERMISSION;
+        if (resp.status == 401) return ERROR_UNAUTHENTICATED;
         return resp.result;
     }
 

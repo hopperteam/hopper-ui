@@ -1,42 +1,49 @@
 import Cookies from 'js-cookie'
 import DummyHopperApi from "./api/dummyHopperApi";
-import {IHopperApi, HopperApi} from "./api/hopperApi";
+import {IHopperApi, HopperApi, HopperError, ERROR_UNAUTHENTICATED, isHopperError} from "./api/hopperApi";
 import {User} from "./types";
+import {HopperUtil} from "./hopperUtil";
 
 export default class SerializationUtil {
     public static hasStoredSession() {
-        return Cookies.get("hopper_api") != undefined || Cookies.get("hopper_api") == "#DUMMY#"
+        return Cookies.get("HOPPER_SESSION") != undefined || !!HopperUtil.getUrlParameter("dummy");
     }
 
-    public static getStoredSession(): IHopperApi {
-        let apiBin = Cookies.get("hopper_api");
-        if (apiBin == "#DUMMY#" || apiBin == undefined) {
+    public static async getStoredSession(): Promise<IHopperApi> {
+        let bearerToken = Cookies.get("HOPPER_SESSION");
+        if (!!HopperUtil.getUrlParameter("dummy") || bearerToken === undefined) {
             return new DummyHopperApi();
         }
-        let api = JSON.parse(atob(apiBin));
-        return new HopperApi(api.root, api.token);
-    }
 
-    public static storeSession(api: IHopperApi) {
-        if (api instanceof HopperApi) {
-            let hApi = api as HopperApi;
-            Cookies.set("hopper_api", btoa(JSON.stringify({"root": hApi.apiRoot, "token": hApi.apiBearerToken})));
-        } else {
-            Cookies.set("hopper_api", "#DUMMY#");
-        }
+        return HopperApi.createApi(bearerToken);
     }
 
     public static deleteStoredSession() {
-        Cookies.remove("hopper_api");
+        Cookies.remove("HOPPER_SESSION");
     }
 
-    public static async getAndCheckStoredSession(): Promise<[IHopperApi, User] | undefined> {
-        if (SerializationUtil.hasStoredSession()) {
-            let api = SerializationUtil.getStoredSession();
-            let user = await api.getCurrentUser();
-            if (user != undefined) {
-                return [api, user];
-            }
+    public static useDummyApi(): boolean {
+        return !!HopperUtil.getUrlParameter("dummy");
+    }
+
+    public static async getAndCheckStoredSession(): Promise<[IHopperApi, User] | HopperError> {
+        if (!this.useDummyApi()) {
+            await HopperApi.loadInfo();
         }
+
+        if (SerializationUtil.hasStoredSession()) {
+            let api = await SerializationUtil.getStoredSession();
+            let result = await api.getCurrentUser();
+            if (isHopperError(result)) {
+                return result;
+            }
+            return [api, result as User];
+        }
+
+        return ERROR_UNAUTHENTICATED;
+    }
+
+    public static navigateToLogin() {
+        document.location.assign(HopperApi.instanceLoginUrl + "?target=" + encodeURIComponent(window.location.href));
     }
 }

@@ -7,7 +7,7 @@ import LoadingView from "components/loadingView";
 import LoadingController from "loadingController";
 import DummyHopperApi from "api/dummyHopperApi";
 import SerializationUtil from "./serializationUtil";
-import {IHopperApi, HopperApi} from "./api/hopperApi";
+import {IHopperApi, HopperApi, isHopperError, ERROR_UNAUTHENTICATED} from "./api/hopperApi";
 
 import "style/app.scss";
 import {WebSocketAdapter} from "./api/webSocketAdapter";
@@ -17,6 +17,13 @@ const UPDATE_INTERVAL = 30000;
 function renderLoadingView() {
     ReactDOM.render(
         <LoadingView />,
+        document.getElementById("root")
+    );
+}
+
+function renderError(error: string) {
+    ReactDOM.render(
+        <p>Error: {error}</p>,
         document.getElementById("root")
     );
 }
@@ -38,16 +45,21 @@ function updateLoop(user: User, notifications: NotificationSet, loadingControlle
 
 function navigateToLogin() {
     SerializationUtil.deleteStoredSession();
-    document.location.assign("/");
+    SerializationUtil.navigateToLogin();
 }
 
 async function main() {
     renderLoadingView();
 
     let res = await SerializationUtil.getAndCheckStoredSession();
-    if (res == undefined) {
-        navigateToLogin();
-        return;
+    if (isHopperError(res)) {
+        if (res == ERROR_UNAUTHENTICATED) {
+            navigateToLogin();
+            return;
+        } else {
+            renderError("No Permission for this instance");
+            return;
+        }
     }
 
     let api: IHopperApi = res[0];

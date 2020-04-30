@@ -1,5 +1,5 @@
 import {Action, App, Notification, SubscribeRequest, Subscription, User} from "types";
-import {IHopperApi} from "api/hopperApi";
+import {HopperError, IHopperApi} from "api/hopperApi";
 
 const LOADING_TIME = 100;
 
@@ -80,13 +80,6 @@ const DEMO_NOTIFICATIONS = [
 ];
 
 export default class DummyHopperApi implements IHopperApi {
-    public async login(email: string, password: string) {
-        return true;
-    }
-
-    public async register(email: string, password: string, firstName: string, lastName: string): Promise<[boolean, string]> {
-        return [true, ""];
-    }
 
     public async getSubscriptions(): Promise<Subscription[]> {
         return new Promise<Subscription[]>(resolve => {
@@ -109,8 +102,8 @@ export default class DummyHopperApi implements IHopperApi {
         });
     }
 
-    getCurrentUser(): Promise<User|undefined> {
-        return new Promise<User|undefined>(resolve => {
+    getCurrentUser(): Promise<User|HopperError> {
+        return new Promise<User|HopperError>(resolve => {
             setTimeout(() => {
                 resolve({firstName: "Test", lastName: "User", email: "testuser@hoppercloud.net"});
             }, LOADING_TIME);

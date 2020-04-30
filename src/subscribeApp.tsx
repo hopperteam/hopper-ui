@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from 'react-dom';
 import LoadingView from "components/loadingView"
-import {IHopperApi} from "api/hopperApi";
+import {ERROR_UNAUTHENTICATED, HopperError, IHopperApi, isHopperError} from "api/hopperApi";
 import {HopperUtil} from "hopperUtil";
 import {App, SubscribeRequest, User} from "types";
 import SerializationUtil from "serializationUtil";
@@ -17,7 +17,7 @@ function renderLoadingView() {
 
 function navigateToLogin() {
     SerializationUtil.deleteStoredSession();
-    document.location.assign("/?redirect=" + encodeURIComponent(location.pathname + location.search));
+    SerializationUtil.navigateToLogin();
 }
 
 function renderError(error: string) {
@@ -47,9 +47,14 @@ function submitCallback(callback: string, subId: string|undefined, error: string
 
 async function main() {
     let res = await SerializationUtil.getAndCheckStoredSession();
-    if (res == undefined) {
-        navigateToLogin();
-        return;
+    if (isHopperError(res)) {
+        if (res == ERROR_UNAUTHENTICATED) {
+            navigateToLogin();
+            return;
+        } else {
+            renderError("No Permission for this instance");
+            return;
+        }
     }
     let api: IHopperApi = res[0];
     let user: User = res[1];
