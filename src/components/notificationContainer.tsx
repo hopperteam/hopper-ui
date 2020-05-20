@@ -1,28 +1,24 @@
 import * as React from 'react';
-import {NotificationSet} from 'notificationSet';
 import {App, Notification, Subscription} from "../types";
-import LoadingController from "../loadingController";
 import {ChangeEvent} from "react";
-import loadingController from "../loadingController";
 import {DefaultNotificationView} from "./notificationViews";
 import "style/notification.scss";
+import { NotificationSet } from 'notificationSet';
+import { LoadingController, SubscriptionManager } from 'loadingController';
 
 type NotificationContainerProps = {
-    notifications: NotificationSet,
     loadingController: LoadingController
 }
 
 type NotificationContainerState = {
     currentlyLoading: boolean,
-    loadingFinished: boolean,
-    includeDone: boolean,
-    currentApp: string | undefined
+    notificationSet: NotificationSet
 }
 
 type NotificationListProps = {
-    mapFunction: (fnc: (x: Notification) => any) => any[],
     doneNotificationsVisible: boolean,
     notifications: NotificationSet,
+    subscriptionManager: SubscriptionManager,
     showLoadingElement: boolean,
     toggleDoneFunction: (not: Notification) => void,
     deleteFunction: (not: Notification) => void
@@ -30,9 +26,8 @@ type NotificationListProps = {
 
 type NotificationFilterChooserProps = {
     includeDone: boolean,
-    notifications: NotificationSet,
     currentSubscription: string | undefined,
-    loadingController: loadingController,
+    subscriptionManager: SubscriptionManager,
     onUpdate: (includeDone: boolean, currentApp: string | undefined) => void
 }
 
@@ -53,20 +48,21 @@ const notificationTypes: { [index: string] : React.ClassType<NotificationViewPro
 export class NotificationContainer extends React.Component<NotificationContainerProps, NotificationContainerState> {
     constructor(props: Readonly<NotificationContainerProps>) {
         super(props);
-        this.state = { currentlyLoading: false, loadingFinished: false, includeDone: false, currentApp: undefined }
+        this.state = { 
+                        notificationSet: this.props.loadingController.getNotificationSet(false, undefined), 
+                        currentlyLoading: false, 
+                     }
     }
 
     private async checkScrollState(el: HTMLElement): Promise<void> {
-        if (this.state.loadingFinished) return;
+        if (!this.state.notificationSet.hasMore) return;
         let invisibleSpaceBottom = el.scrollHeight - el.offsetHeight - el.scrollTop;
 
         if (invisibleSpaceBottom < 1000) {
             if (this.state.currentlyLoading) return;
             this.setState({currentlyLoading: true});
-
-            let loaded = await this.props.loadingController.loadNotifications(this.state.includeDone, this.state.currentApp);
-
-            this.setState({currentlyLoading: false, loadingFinished: !loaded});
+            await this.state.notificationSet.loadMore();
+            this.setState({currentlyLoading: false});
         }
         return this.checkScrollState(el);
     }
@@ -80,46 +76,48 @@ export class NotificationContainer extends React.Component<NotificationContainer
     private resizeListener = this.callCheckScrollState.bind(this);
 
     async componentDidMount() {
-        this.props.loadingController.onUpdateListener = () => {
-            this.forceUpdate();
-        };
+        //this.props.loadingController.onUpdateListener = () => {
+        //    this.forceUpdate();
+        //};
         window.addEventListener("resize", this.resizeListener);
         await this.callCheckScrollState();
     }
 
     componentWillUnmount(): void {
-        this.props.loadingController.onUpdateListener = () => { };
+        //this.props.loadingController.onUpdateListener = () => { };
         window.removeEventListener("resize", this.resizeListener);
     }
 
     private onFilterUpdate(includeDone: boolean, currentApp: string | undefined) {
         this.setState({
-            currentApp: currentApp,
-            includeDone: includeDone,
+            notificationSet: this.props.loadingController.getNotificationSet(includeDone, currentApp),
             currentlyLoading: false,
-            loadingFinished: this.props.loadingController.isFullyLoaded(includeDone, currentApp)
         });
     }
 
     private async toggleDone(not: Notification) {
         if (not.isDone) {
-            await this.props.loadingController.markAsUndone(not);
+            await this.state.notificationSet.markAsUndone(not);
         } else {
-            await this.props.loadingController.markAsDone(not);
+            await this.state.notificationSet.markAsDone(not);
         }
     }
 
     private async deleteNotification(not: Notification) {
-        await this.props.loadingController.deleteNotification(not);
+        await this.state.notificationSet.deleteNotification(not);
     }
 
     render(): React.ReactNode {
-        return <div id="notificationContainer" onScroll={ e => this.checkScrollState(e.target as HTMLElement) } >
-            <NotificationFilterChooser notifications={this.props.notifications} currentSubscription={this.state.currentApp} includeDone={this.state.includeDone} onUpdate={this.onFilterUpdate.bind(this)} loadingController={this.props.loadingController} />
-            <NotificationList notifications={this.props.notifications}
-                              doneNotificationsVisible={this.state.includeDone}
-                              mapFunction={this.props.loadingController.getMapFunction(this.state.includeDone, this.state.currentApp)}
-                              showLoadingElement={!this.state.loadingFinished}
+        return <div id="notificationContainer" 
+                    onScroll={ e => this.checkScrollState(e.target as HTMLElement) }>
+            <NotificationFilterChooser  subscriptionManager={this.props.loadingController.subscriptionManager}
+                                        currentSubscription={this.state.notificationSet.category.subscription} 
+                                        includeDone={this.state.notificationSet.category.includeDone} 
+                                        onUpdate={this.onFilterUpdate.bind(this)} /> 
+            <NotificationList notifications={this.state.notificationSet}
+                              subscriptionManager={this.props.loadingController.subscriptionManager}
+                              doneNotificationsVisible={this.state.notificationSet.category.includeDone}
+                              showLoadingElement={this.state.notificationSet.hasMore}
                               toggleDoneFunction={this.toggleDone.bind(this)}
                               deleteFunction={this.deleteNotification.bind(this)} />
         </div>
@@ -151,19 +149,15 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
             <div id="selectorSeparator" />
             <div id="appLabels">
             {
-                Object.keys(this.props.notifications.subscriptionCategories)
-                    .map(subscriptionId => {
-                        return {subscription: this.props.notifications.subscriptions[subscriptionId], notifications: this.props.loadingController.getLoaded(false, subscriptionId)};
-                    })
-                    .sort((x, y) => y.notifications - x.notifications)
-                    .map(x => {
-                        return <img src={x.subscription.app.imageUrl}
-                                    alt={x.subscription.app.name + " (" + x.notifications + ")"}
-                                    onClick={() => this.onSubscriptionClick(x.subscription.id)}
-                                    id={"app-" + x.subscription.id}
-                                    key={x.subscription.id}
+                this.props.subscriptionManager
+                    .map(subscription => {
+                        return <img src={subscription.app.imageUrl}
+                                    alt={subscription.app.name}
+                                    onClick={() => this.onSubscriptionClick(subscription.id)}
+                                    id={"app-" + subscription.id}
+                                    key={subscription.id}
                                     onError={evt => { evt.currentTarget.onerror = () => {}; evt.currentTarget.src = require('img/unknown_app.svg')} }
-                                    className={"appFilter " + (this.props.currentSubscription !== undefined && this.props.currentSubscription !== x.subscription.id ? "appFilterNotSelected" : "") } />;
+                                    className={"appFilter " + (this.props.currentSubscription !== undefined && this.props.currentSubscription !== subscription.id ? "appFilterNotSelected" : "") } />;
                     })
             }
             </div>
@@ -174,14 +168,21 @@ export class NotificationFilterChooser extends React.Component<NotificationFilte
 export class NotificationList extends React.Component<NotificationListProps> {
     render(): React.ReactNode {
         return <div id="notificationList" >
-            {this.props.mapFunction(value => {
+            {this.props.notifications.map(value => {
                 let x = notificationTypes[value.type];
                 if (x == undefined) {
                     console.error("Could not render notification " + value.id + "! Invalid type " + value.type);
                     return;
                 }
 
-                return React.createElement(x, {key: value.id, doneNotificationsVisible: this.props.doneNotificationsVisible, notification: value, subscription: this.props.notifications.getSubscriptionOrDefault(value.subscription), toggleDoneFunction: this.props.toggleDoneFunction, deleteFunction: this.props.deleteFunction}, null);
+                return React.createElement(x, {
+                    key: value.id, 
+                    doneNotificationsVisible: this.props.doneNotificationsVisible, 
+                    notification: value, 
+                    subscription: this.props.subscriptionManager.getSubscriptionOrDefault(value.subscription), 
+                    toggleDoneFunction: this.props.toggleDoneFunction, 
+                    deleteFunction: this.props.deleteFunction
+                }, null);
             })}
             { this.props.showLoadingElement ? <LoadingNotificationView /> : "" }
         </div>
