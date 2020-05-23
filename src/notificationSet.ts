@@ -1,142 +1,134 @@
 import {App, Notification, Subscription} from "types";
+import { LoadingController, NotificationCategory} from "loadingController";
+import { IHopperApi } from "api/hopperApi";
 
-const UNKNOWN_SUBSCRIPTION: Subscription = {
-    id: "UNKNOWN",
-    app: {
-        id: "UNKNOWN",
-        name: "Unknown App",
-        imageUrl: require("img/unknown_app.svg"),
-        isActive: false,
-        isHidden: true,
-        baseUrl: document.location.protocol + "//"  + document.location.host,
-        manageUrl: document.location.protocol + "//"  + document.location.host
-    }
-}
-
-export class TimestampOrderedList {
-    public data: {id: string, timestamp: number}[];
-
-    constructor() {
-        this.data = [];
-    }
-
-    private searchTimestamp(timestamp: number): number {
-        for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i].timestamp <= timestamp) return i;
-        }
-        return -1;
-    }
-
-    public getIndex(id: string, timestamp: number): number {
-        let fId = this.searchTimestamp(timestamp);
-        for (; fId < this.data.length && this.data[fId].timestamp >= timestamp; fId++) {
-            if (this.data[fId].id == id) return fId;
-        }
-        return -1;
-    }
-
-    public insertTimestamp(id: string, timestamp: number) {
-        let ind = this.searchTimestamp(timestamp);
-        this.data.splice(ind, 0, {id: id, timestamp: timestamp});
-    }
-
-    public removeTimestamp(id: string, timestamp: number) {
-        let ind = this.searchTimestamp(timestamp);
-        if (ind == -1) return;
-        for (; ind < this.data.length && this.data[ind].timestamp >= timestamp; ind++) {
-            if (this.data[ind].id == id) {
-                this.data.splice(ind, 1);
-                return;
-            }
-        }
-    }
-}
-
-class NotificationCategory {
-    public all: TimestampOrderedList;
-    public open: TimestampOrderedList;
-
-    constructor() {
-        this.all = new TimestampOrderedList();
-        this.open = new TimestampOrderedList();
-    }
-
-    public insertTimestamp(id: string, timestamp: number, done: boolean) {
-        this.all.insertTimestamp(id, timestamp);
-        if (!done) {
-            this.open.insertTimestamp(id, timestamp);
-        }
-    }
-
-    public removeTimestamp(id: string, timestamp: number) {
-        this.all.removeTimestamp(id, timestamp);
-        this.open.removeTimestamp(id, timestamp);
-    }
-}
+const LOAD_BATCH_SIZE = 10;
 
 export class NotificationSet {
-    public notifications: { [index: string] : Notification};
-    public subscriptions: { [index: string] : Subscription};
-    public subscriptionCategories: { [index: string] : (NotificationCategory)};
-    public rootCategory: NotificationCategory;
-
-    constructor() {
-        this.notifications = {};
-        this.subscriptions = {};
-        this.subscriptionCategories = {};
-        this.rootCategory = new NotificationCategory()
+    private _api: IHopperApi;
+    private _loadingController: LoadingController;
+    private _category: NotificationCategory;  
+    private _data: Notification[];
+    private _hasMore: boolean;
+    
+    constructor(api: IHopperApi, loadingController: LoadingController, category: NotificationCategory) {
+        this._api = api;
+        this._loadingController = loadingController;
+        this._category = category;
+        this._data = [];
+        this._hasMore = true;
     }
 
-    public insertSubscription(subscription: Subscription) {
-        this.subscriptions[subscription.id] = subscription;
-        this.subscriptionCategories[subscription.id] = new NotificationCategory();
+    public get hasMore() {
+        return this._hasMore;
     }
 
-    public deleteSubscription(subscriptionId: string) {
-        delete this.subscriptions[subscriptionId];
-        if (subscriptionId in this.subscriptionCategories)
-            delete this.subscriptionCategories[subscriptionId];
+    public get category() {
+        return this._category;
     }
 
-    private insertNotification(not: Notification) {
-        this.notifications[not.id] = not;
-        this.rootCategory.insertTimestamp(not.id, not.timestamp, not.isDone);
-        if (not.subscription in this.subscriptionCategories)
-            this.subscriptionCategories[not.subscription].insertTimestamp(not.id, not.timestamp, not.isDone);
+    public map(fnc: (x: Notification) => any): any[] {
+        return this._data.map(fnc);
     }
 
-    public hasNotification(id: string): boolean {
-        return id in this.notifications
+    public clearCache() {
+        this._data = [];
+        this._hasMore = true;
     }
 
-    public integrateNotifications(not: Notification[]) {
-        not.filter(n => !this.hasNotification(n.id)).forEach(n => this.insertNotification(n));
+    public getLoaded(): number {
+        return this._data.length;
     }
 
-    public updateNotification(not: Notification) {
-        this.deleteNotification(not.id);
-        this.insertNotification(not);
+    public appendNotifications(nots: Notification[]) {
+        this._data = this._data.concat(nots);
     }
 
-    public deleteNotification(id: string) {
-        let not = this.notifications[id];
-        if (not == undefined) return;
-        delete this.notifications[id];
+    public async loadMore() {
+        let nots = await this._api.getNotifications(
+                this._category.includeDone, 
+                this._category.subscription, 
+                this._data.length, 
+                this._data.length + LOAD_BATCH_SIZE
+        );
 
-        this.rootCategory.removeTimestamp(id, not.timestamp);
-        if (not.subscription in this.subscriptionCategories)
-            this.subscriptionCategories[not.subscription].removeTimestamp(id, not.timestamp);
+        if (nots.length < LOAD_BATCH_SIZE) {
+            this._hasMore = false;
+        }
+
+        this.appendNotifications(nots);
     }
 
-    public getNotification(id: string): Notification {
-        return this.notifications[id];
+    public async markAsUndone(not: Notification) {
+        if (!await this._api.markNotificationAsUndone(not.id)) {
+            // Error
+            return;
+        }
+        let ind = this._data.indexOf(not)
+        if (ind == -1) {
+            return; 
+        }
+        this._data[ind].isDone = false;
     }
 
-    public getSubscriptionOrDefault(id: string): Subscription {
-        if (id in this.subscriptions)
-            return this.subscriptions[id];
-        return UNKNOWN_SUBSCRIPTION;
+    public async markAsDone(not: Notification) {
+        if (!await this._api.markNotificationAsDone(not.id)) {
+            // Error
+            return;
+        }
+        let ind = this._data.indexOf(not)
+        if (ind === -1) return; 
+
+        if (this._category.includeDone) {
+            this._data[ind].isDone = true;
+        } else {
+            this._data.splice(ind, 1);
+        }
+    }
+
+    public async deleteNotification(not: Notification) {
+        if (!await this._api.deleteNotification(not.id)) {
+            // Error
+            return;
+        }
+        let ind = this._data.indexOf(not)
+        if (ind === -1) return; 
+
+        this._data.splice(ind);
+    }
+
+    private indexOfById(id: string) {
+        for (let i = 0; i < this._data.length; ++i) {
+            if (this._data[i].id === id) return i; 
+        }
+        return -1;
+    }
+
+    public async deleteNotificationById(notId: string) {
+        let index = this.indexOfById(notId);
+        if (index === -1) return;
+        
+        this._data.splice(index);
+    }
+
+    public async insertNotificationIfRelevant(not: Notification) {
+        if (!this.isRelevant(not)) return;
+        // Determine index
+        let i = 0;
+        for (; i < this._data.length && this._data[i].timestamp > not.timestamp; ++i) {  }
+        
+        this._data.splice(i, 0, not);
+    }
+
+    public async updateNotification(not: Notification) {
+        this.deleteNotificationById(not.id);
+        this.insertNotificationIfRelevant(not);
+    }
+
+    public isRelevant(not: Notification) {
+        if (this._category.subscription !== undefined && this._category.subscription !== not.subscription) return false;
+        if (!this._category.includeDone && not.isDone) return false;
+
+        return true;
     }
 }
-
-

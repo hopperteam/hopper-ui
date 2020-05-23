@@ -1,16 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from 'react-dom';
 import {User} from "types";
-import {NotificationSet} from "notificationSet"
 import MainView from "components/mainView";
 import LoadingView from "components/loadingView";
-import LoadingController from "loadingController";
 import DummyHopperApi from "api/dummyHopperApi";
 import SerializationUtil from "./serializationUtil";
 import {IHopperApi, HopperApi, isHopperError, ERROR_UNAUTHENTICATED} from "./api/hopperApi";
 
 import "style/app.scss";
 import {WebSocketAdapter} from "./api/webSocketAdapter";
+import { LoadingController } from "loadingController";
 
 const UPDATE_INTERVAL = 30000;
 
@@ -28,19 +27,20 @@ function renderError(error: string) {
     );
 }
 
-function updateView(user: User, notifications: NotificationSet, loadingController: LoadingController) {
+function updateView(user: User, loadingController: LoadingController) {
     ReactDOM.render(
-        <MainView onClickLogout={navigateToLogin} user={user} notifications={notifications} loadingController={loadingController} />,
+        <MainView onClickLogout={navigateToLogin} user={user} 
+                  loadingController={loadingController} />,
         document.getElementById("root")
     );
     setTimeout(() => {
-        updateView(user, notifications, loadingController);
+        updateView(user, loadingController);
     });
 }
 
-function updateLoop(user: User, notifications: NotificationSet, loadingController: LoadingController) {
-    setTimeout(() => updateLoop(user, notifications, loadingController), UPDATE_INTERVAL);
-    updateView(user, notifications, loadingController);
+function updateLoop(user: User, loadingController: LoadingController) {
+    setTimeout(() => updateLoop(user, loadingController), UPDATE_INTERVAL);
+    updateView(user, loadingController);
 }
 
 function navigateToLogin() {
@@ -65,21 +65,18 @@ async function main() {
     let api: IHopperApi = res[0];
     let user: User = res[1];
 
-    let notifications = new NotificationSet();
-
-    let loadingController = new LoadingController(api, notifications);
+    let loadingController = new LoadingController(api);
     if (api instanceof DummyHopperApi) {
         // @ts-ignore
         document._hopperApi = api; // For Testing API access
         // @ts-ignore
         document._loadingController = loadingController;
         let _user = user;
-        let _notifications = notifications;
         let _lC = loadingController;
         // @ts-ignore
         document._updateHopperUi = () => {
-
-            updateView(_user, _notifications, _lC);
+            loadingController.currentNotificationSet.clearCache();
+            updateView(_user, _lC);
         }
     } else {
         try {
@@ -91,9 +88,9 @@ async function main() {
             return;
         }
     }
-    await loadingController.loadApps();
+    await loadingController.init();
 
-    updateView(user, notifications, loadingController);
+    updateView(user, loadingController);
 }
 
 main();

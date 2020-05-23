@@ -1,15 +1,13 @@
 import * as React from 'react';
 import {User} from 'types';
-import {NotificationSet} from "notificationSet";
 import {NotificationContainer} from 'components/notificationContainer'
 import TopBarView from 'components/topBarView'
-import LoadingController from "loadingController";
 import TopMessage from "components/topMessage";
 import {DesktopNotificationManager} from "desktopNotificationManager";
+import { LoadingController } from 'loadingController';
 
 type MainViewProps = {
     user: User,
-    notifications: NotificationSet,
     loadingController: LoadingController,
     onClickLogout: () => void
 }
@@ -40,8 +38,9 @@ export default class MainView extends React.Component<MainViewProps, MainViewSta
                                onButtonClick={this.requestNotificationsPermission.bind(this)}
                                onClose={ () => this.setState({ dismissedNotificationMessage: true })} />
             }
-            <TopBarView onClickLogout={this.props.onClickLogout} user={this.props.user} />
-            <NotificationContainer notifications={this.props.notifications} loadingController={this.props.loadingController} />
+            <TopBarView onClickLogout={this.props.onClickLogout} 
+                        user={this.props.user} />
+            <NotificationContainer loadingController={this.props.loadingController} />
         </div>;
     }
 }

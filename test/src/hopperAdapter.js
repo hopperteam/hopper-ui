@@ -29,7 +29,7 @@ export default class HopperAdapter {
         await driver.executeScript(function() {
             let controller = document._loadingController;
 
-            controller.insertSubscription(
+            controller.subscriptionManager.insertSubscription(
                 {
                     id: arguments[0],
                     app: {
@@ -49,9 +49,9 @@ export default class HopperAdapter {
 
     async insertNotification(driver, name, sender) {
         await driver.executeScript(function() {
-            let controller = document._loadingController;
+            let api = document._hopperApi;
 
-            controller.notificationSet.integrateNotifications([
+            api.DEMO_NOTIFICATIONS.unshift(
                 {
                     id: arguments[0],
                     heading: arguments[1],
@@ -63,9 +63,7 @@ export default class HopperAdapter {
                     actions: [],
                     timestamp: Date.now(),
                 }
-            ]);
-            controller.rootCategory.loaded += 1;
-            controller.subscriptionCategories[arguments[2]].loaded += 1;
+            );
             document._updateHopperUi();
         }, this.getNotificationId(name), name, await this.getAppId(sender, driver));
     }
@@ -73,8 +71,7 @@ export default class HopperAdapter {
     async isNotificationDone(driver, name) {
         let id = this.getNotificationId(name);
         return driver.executeScript(function () {
-            let controller = document._loadingController;
-            return controller.notificationSet.notifications[arguments[0]].isDone
+            return document._hopperApi.DEMO_NOTIFICATIONS[0].isDone;
         }, id);
     }
 

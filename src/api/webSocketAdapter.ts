@@ -1,7 +1,7 @@
-import LoadingController from "../loadingController";
 import {Notification, Subscription} from "../types";
 import {DesktopNotificationManager} from "../desktopNotificationManager";
 import { HopperApi } from "./hopperApi";
+import { LoadingController } from "loadingController";
 
 export class WebSocketAdapter {
     static async openWebSocket(loadingController: LoadingController, api: HopperApi): Promise<WebSocketAdapter> {
@@ -30,27 +30,27 @@ export class WebSocketAdapter {
     };
 
     private static onCreateNotificationEvent(adapter: WebSocketAdapter, data: Notification) {
-        adapter.loadingController.insertNotification(data, true);
+        adapter.loadingController.currentNotificationSet.insertNotificationIfRelevant(data);
     }
 
     private static onDeleteNotificationEvent(adapter: WebSocketAdapter, data: string) {
-        adapter.loadingController.deleteNotificationById(data);
+        adapter.loadingController.currentNotificationSet.deleteNotificationById(data);
     }
 
     private static onUpdateNotificationEvent(adapter: WebSocketAdapter, data: Notification) {
-        adapter.loadingController.updateNotification(data);
+        adapter.loadingController.currentNotificationSet.updateNotification(data);
     }
 
     private static onCreateSubscriptionEvent(adapter: WebSocketAdapter, data: Subscription) {
-        adapter.loadingController.insertSubscription(data);
+        adapter.loadingController.subscriptionManager.insertSubscription(data);
     }
 
     private static onDeleteSubscriptionEvent(adapter: WebSocketAdapter, data: string) {
-        adapter.loadingController.deleteSubscription(data);
+        adapter.loadingController.subscriptionManager.deleteSubscriptionById(data);
     }
 
     private static onUpdateSubscriptionEvent(adapter: WebSocketAdapter, data: Subscription) {
-        adapter.loadingController.updateSubscription(data);
+        adapter.loadingController.subscriptionManager.updateSubscription(data);
     }
 
     private ws: WebSocket;

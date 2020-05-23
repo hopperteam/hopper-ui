@@ -78,6 +78,7 @@ Given(/^Checkbox "([^"]*)" is( not)? checked$/, async function (checkbox, not) {
 });
 
 When(/^User clicks on button "([^"]*)" in Notification "([^"]*)"$/, async function (button, notification) {
+    await sleep(1000);
     let id = adapter.getNotificationId(notification);
     let el = driver.findElement(By.id('not-' + id));
     let buttonEl: WebElement|undefined;
