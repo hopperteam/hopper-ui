@@ -70,13 +70,8 @@ export default class HopperAdapter {
 
     async isNotificationDone(driver, name) {
         let id = this.getNotificationId(name);
-        console.log(id);
-        console.log(await driver.executeScript(function() {
-            return document._hopperApi.DEMO_NOTIFICATIONS;
-
-        }));
         return driver.executeScript(function () {
-            return document._hopperApi.DEMO_NOTIFICATIONS[0].isDone
+            return document._hopperApi.DEMO_NOTIFICATIONS[0].isDone;
         }, id);
     }
 
