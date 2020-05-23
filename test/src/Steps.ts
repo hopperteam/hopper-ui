@@ -24,7 +24,7 @@ async function sleep(ms: number) {
 Given(/^User is on hopper$/, async function () {
     await driver.manage().deleteAllCookies();
     (await driver.manage().getTimeouts()).implicit = 2 * 1000;
-    await driver.get("http://localhost/?dummy")
+    await driver.get("http://localhost:8080/?dummy")
 });
 
 Given(/^User is logged in$/, async function () {
@@ -78,6 +78,7 @@ Given(/^Checkbox "([^"]*)" is( not)? checked$/, async function (checkbox, not) {
 });
 
 When(/^User clicks on button "([^"]*)" in Notification "([^"]*)"$/, async function (button, notification) {
+    await sleep(1000);
     let id = adapter.getNotificationId(notification);
     let el = driver.findElement(By.id('not-' + id));
     let buttonEl: WebElement|undefined;

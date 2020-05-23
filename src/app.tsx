@@ -75,7 +75,7 @@ async function main() {
         let _lC = loadingController;
         // @ts-ignore
         document._updateHopperUi = () => {
-
+            loadingController.currentNotificationSet.clearCache();
             updateView(_user, _lC);
         }
     } else {

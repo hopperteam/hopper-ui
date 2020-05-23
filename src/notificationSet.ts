@@ -31,6 +31,11 @@ export class NotificationSet {
         return this._data.map(fnc);
     }
 
+    public clearCache() {
+        this._data = [];
+        this._hasMore = true;
+    }
+
     public getLoaded(): number {
         return this._data.length;
     }
