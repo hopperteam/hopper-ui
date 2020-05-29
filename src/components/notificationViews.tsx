@@ -134,14 +134,14 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
         }
     }
 
-    async clickAction(a: Action) {
+    clickAction(a: Action) {
         console.log(a)
         if (a.type === "text") {
             this.setState({
                 activeAction: a
             });
         } else {
-            await this.executeAction(a);
+            this.executeAction(a);
         }
     }
 
@@ -151,22 +151,22 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
         });
     }
 
-    async executeAction(a: Action, text: string = "") {
-        await ActionExecutor.executeAction(a, text);
+    executeAction(a: Action, text: string = "") {
+        ActionExecutor.executeAction(a, text);
         if (a.markAsDone && !this.props.notification.isDone) {
             this.toggleDone();
         }
     }
 
-    async executeTextAction() {
-        await this.executeAction(this.state.activeAction!, this.state.textInput);
+    executeTextAction() {
+        this.executeAction(this.state.activeAction!, this.state.textInput);
         this.textActionCancel();
         return false;
     }
 
-    async textActionKeyDown(evt: React.KeyboardEvent<HTMLInputElement>) {
+    textActionKeyDown(evt: React.KeyboardEvent<HTMLInputElement>) {
         if (evt.key == 'Enter') {
-            await this.executeTextAction();
+            this.executeTextAction();
         } else if (evt.key == 'Escape') {
             this.textActionCancel();
         }
