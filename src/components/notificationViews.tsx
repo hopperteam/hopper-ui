@@ -161,6 +161,15 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
     async executeTextAction() {
         await this.executeAction(this.state.activeAction!, this.state.textInput);
         this.textActionCancel();
+        return false;
+    }
+
+    async textActionKeyDown(evt: React.KeyboardEvent<HTMLInputElement>) {
+        if (evt.key == 'Enter') {
+            await this.executeTextAction();
+        } else if (evt.key == 'Escape') {
+            this.textActionCancel();
+        }
     }
 
     render(): React.ReactNode {
@@ -205,9 +214,9 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
                             </div>
                             :
                             <div className="notificationTextAction">
-                                <input className="notificationTextInput" type="text" value={this.state.textInput} onChange={(event) => this.setState({ textInput: event.target.value }) } />
-                                <div className="notificationTextButton notificationTextAbort" onClick={this.textActionCancel.bind(this)} />
-                                <div className="notificationTextButton notificationTextSend" onClick={this.executeTextAction.bind(this)}  />
+                                    <input autoFocus className="notificationTextInput" type="text" value={this.state.textInput} onChange={(event) => this.setState({ textInput: event.target.value }) } onKeyDown={this.textActionKeyDown.bind(this)}/>
+                                    <div className="notificationTextButton notificationTextAbort" onClick={this.textActionCancel.bind(this)} />
+                                    <div className="notificationTextButton notificationTextSend" onClick={this.executeTextAction.bind(this)}  />
                             </div>
                     }
                 </div>
