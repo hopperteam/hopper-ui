@@ -7,10 +7,10 @@ const LOAD_BATCH_SIZE = 10;
 export class NotificationSet {
     private _api: IHopperApi;
     private _loadingController: LoadingController;
-    private _category: NotificationCategory;  
+    private readonly _category: NotificationCategory;
     private _data: Notification[];
     private _hasMore: boolean;
-    
+
     constructor(api: IHopperApi, loadingController: LoadingController, category: NotificationCategory) {
         this._api = api;
         this._loadingController = loadingController;
@@ -46,9 +46,9 @@ export class NotificationSet {
 
     public async loadMore() {
         let nots = await this._api.getNotifications(
-                this._category.includeDone, 
-                this._category.subscription, 
-                this._data.length, 
+                this._category.includeDone,
+                this._category.subscription,
+                this._data.length,
                 this._data.length + LOAD_BATCH_SIZE
         );
 
@@ -66,7 +66,7 @@ export class NotificationSet {
         }
         let ind = this._data.indexOf(not)
         if (ind == -1) {
-            return; 
+            return;
         }
         this._data[ind].isDone = false;
     }
@@ -77,7 +77,7 @@ export class NotificationSet {
             return;
         }
         let ind = this._data.indexOf(not)
-        if (ind === -1) return; 
+        if (ind === -1) return;
 
         if (this._category.includeDone) {
             this._data[ind].isDone = true;
@@ -92,14 +92,14 @@ export class NotificationSet {
             return;
         }
         let ind = this._data.indexOf(not)
-        if (ind === -1) return; 
+        if (ind === -1) return;
 
-        this._data.splice(ind);
+        this._data.splice(ind, 1);
     }
 
     private indexOfById(id: string) {
         for (let i = 0; i < this._data.length; ++i) {
-            if (this._data[i].id === id) return i; 
+            if (this._data[i].id === id) return i;
         }
         return -1;
     }
@@ -107,8 +107,8 @@ export class NotificationSet {
     public async deleteNotificationById(notId: string) {
         let index = this.indexOfById(notId);
         if (index === -1) return;
-        
-        this._data.splice(index);
+
+        this._data.splice(index, 1);
     }
 
     public async insertNotificationIfRelevant(not: Notification) {
@@ -116,13 +116,13 @@ export class NotificationSet {
         // Determine index
         let i = 0;
         for (; i < this._data.length && this._data[i].timestamp > not.timestamp; ++i) {  }
-        
+
         this._data.splice(i, 0, not);
     }
 
     public async updateNotification(not: Notification) {
-        this.deleteNotificationById(not.id);
-        this.insertNotificationIfRelevant(not);
+        await this.deleteNotificationById(not.id);
+        await this.insertNotificationIfRelevant(not);
     }
 
     public isRelevant(not: Notification) {

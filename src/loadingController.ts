@@ -8,8 +8,8 @@ export type NotificationCategory = {
 }
 
 export class LoadingController {
-    private api: IHopperApi;
-    private _subscriptionManager: SubscriptionManager;
+    private readonly api: IHopperApi;
+    private readonly _subscriptionManager: SubscriptionManager;
     private _currentNotificationSet: NotificationSet | undefined;
 
     constructor(api: IHopperApi) {
@@ -22,9 +22,9 @@ export class LoadingController {
     }
 
     public async init() {
-        this._subscriptionManager.loadSubscriptions();
+        await this._subscriptionManager.loadSubscriptions();
     }
- 
+
     public getNotificationSet(includeDone: boolean, subscription: string | undefined): NotificationSet {
         let set = new NotificationSet(this.api, this, {includeDone: includeDone, subscription: subscription});
         this._currentNotificationSet = set;
@@ -34,7 +34,7 @@ export class LoadingController {
     public get subscriptionManager(): SubscriptionManager {
         return this._subscriptionManager;
     }
-    
+
 }
 
 const UNKNOWN_SUBSCRIPTION: Subscription = {
