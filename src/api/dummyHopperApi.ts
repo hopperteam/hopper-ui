@@ -73,18 +73,18 @@ export default class DummyHopperApi implements IHopperApi {
     ];
 
     DEMO_NOTIFICATIONS = [
-        _createNotification("1","Account created", "1234", Math.floor(Date.now()) - 100, undefined, false, false, "default", "Welcome to your hopper account!", [_createAction("post", "", true, "Ok!")]),
+        _createNotification("1","Account created", "1234", Math.floor(Date.now()) - 100, undefined, false, false, "default", "Welcome to your hopper account!", [_createAction("submit", "", true, "Ok!")]),
         _createNotification("2","Welcome!", "1234", Math.floor(Date.now()) - 500, undefined, false, false, "default", "Notifications will appear here!", []),
         _createNotification("3","1 new transaction", "fbac", Math.floor(Date.now()) - 600, undefined, false, true, "default", "+ 500€ from Marc Jacob", [_createAction("redirect", "https://example.com", false, "open")]),
         _createNotification("4","2 new transactions", "fbac", Math.floor(Date.now()) - 700, undefined, false, false, "default", "- 200 € to Konrad Hartwig\n+ 7,50€ from DHBW Karlsruhe", [_createAction("redirect", "https://example.com", false, "open")]),
         _createNotification("5","1 new message from your caretaker", "xbda", Math.floor(Date.now()) - 4000, undefined, true, false, "default", "1 new message", [_createAction("submit", "https://example.com", false, "ignore")]),
-        _createNotification("6","Max Müller", "abcd", Math.floor(Date.now()) - 23000, undefined, false, false, "default", "Wanna have a drink tonight?", [_createAction("text", "https://example.com", false, "reply")]),
-        _createNotification("7","Marie Mustermann", "abcd", Math.floor(Date.now())  - 30, undefined, true, false, "default", "What are you doing later today?", [_createAction("text", "https://example.com", false, "reply")]),
+        _createNotification("6","Max Müller", "abcd", Math.floor(Date.now()) - 23000, undefined, false, false, "default", "Wanna have a drink tonight?", [_createAction("text", "https://example.com", true, "reply")]),
+        _createNotification("7","Marie Mustermann", "abcd", Math.floor(Date.now())  - 30, undefined, false, false, "default", "What are you doing later today?", [_createAction("text", "https://example.com", true, "Reply"), _createAction("submit", "https://example.com", true, "Mark as read")]),
         _createNotification("8","1 new message in your postbox", "fbac", Math.floor(Date.now())  - 900, undefined, false, false, "default", "Tax refund", [_createAction("redirect", "https://example.com", false, "open")]),
         _createNotification("9","You still have to pay your rent", "xbda", Math.floor(Date.now())  - 200, undefined, false, false, "default", "2 days overdue", []),
     ];
 
-    
+
 
     public async getSubscriptions(): Promise<Subscription[]> {
         return new Promise<Subscription[]>(resolve => {
