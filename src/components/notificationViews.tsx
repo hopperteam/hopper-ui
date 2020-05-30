@@ -1,7 +1,7 @@
 import * as React from "react";
 import {NotificationViewProps} from "./notificationContainer";
-import {Simulate} from "react-dom/test-utils";
-import drag = Simulate.drag;
+import {Action} from "types";
+import {ActionExecutor} from "../api/actionExecutor";
 
 function getTimeText(date: number): string {
     let diff = Date.now() - date;
@@ -30,6 +30,8 @@ function getTimeText(date: number): string {
 type NotificationViewState = {
     dragX: number
     dragReached: number
+    activeAction: Action | undefined
+    textInput: string
 }
 
 export class DefaultNotificationView extends React.Component<NotificationViewProps, NotificationViewState> {
@@ -42,7 +44,9 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
         super(props);
         this.state = {
             dragX: 0,
-            dragReached: 0
+            dragReached: 0,
+            activeAction: undefined,
+            textInput: ""
         }
     }
 
@@ -130,6 +134,44 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
         }
     }
 
+    clickAction(a: Action) {
+        console.log(a)
+        if (a.type === "text") {
+            this.setState({
+                activeAction: a
+            });
+        } else {
+            this.executeAction(a);
+        }
+    }
+
+    textActionCancel() {
+        this.setState({
+            activeAction: undefined
+        });
+    }
+
+    executeAction(a: Action, text: string = "") {
+        ActionExecutor.executeAction(a, text);
+        if (a.markAsDone && !this.props.notification.isDone) {
+            this.toggleDone();
+        }
+    }
+
+    executeTextAction() {
+        this.executeAction(this.state.activeAction!, this.state.textInput);
+        this.textActionCancel();
+        return false;
+    }
+
+    textActionKeyDown(evt: React.KeyboardEvent<HTMLInputElement>) {
+        if (evt.key == 'Enter') {
+            this.executeTextAction();
+        } else if (evt.key == 'Escape') {
+            this.textActionCancel();
+        }
+    }
+
     render(): React.ReactNode {
         return <div id={"not-" + this.props.notification.id}
                     className={"notification " + (this.state.dragX >= 0 ? ( !this.props.notification.isDone ? "markingDone" : "markingUndone") : "deleting") + ( !this.props.notification.isDone ? " undone" : " done")}>
@@ -163,6 +205,20 @@ export class DefaultNotificationView extends React.Component<NotificationViewPro
                             </div>
                         </div>
                     </div>
+                    {
+                        (this.state.activeAction === undefined) ?
+                            <div className="notificationActions">
+                                {(this.props.notification.actions).map(action => {
+                                    return <div className="notificationAction" onClick={() => this.clickAction(action)} key={this.props.notification.id + "-" + action.text}>{action.text}</div>
+                                })}
+                            </div>
+                            :
+                            <div className="notificationTextAction">
+                                    <input autoFocus className="notificationTextInput" type="text" value={this.state.textInput} onChange={(event) => this.setState({ textInput: event.target.value }) } onKeyDown={this.textActionKeyDown.bind(this)}/>
+                                    <div className="notificationTextButton notificationTextAbort" onClick={this.textActionCancel.bind(this)} />
+                                    <div className="notificationTextButton notificationTextSend" onClick={this.executeTextAction.bind(this)}  />
+                            </div>
+                    }
                 </div>
                 <div className="notificationRightBox">
                     <div className="notificationButtons">

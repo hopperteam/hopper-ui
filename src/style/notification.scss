@@ -256,3 +256,64 @@
     margin-right: 8px;
     content: "";
 }
+
+.notificationActions {
+    padding-left: 8px;
+}
+
+.notificationAction {
+    float: left;
+    padding: 4px 8px 4px 8px;
+    margin: 0 0 8px 0;
+    font-weight: bold;
+    color: $hopperGreenDark;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color .1s;
+}
+
+.notificationAction:hover {
+    background-color: #ddd;
+}
+
+.notificationAction:active {
+    background-color: #aaa;
+}
+
+.notificationTextAction {
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-top-right-radius: 2px;
+    background: $hopperGreenDark;
+    display: flex;
+}
+
+.notificationTextInput {
+    background: transparent;
+    border: none;
+    outline: none;
+    margin: 7px;
+    font-size: 1rem;
+    color: white;
+    flex-grow: 1;
+}
+
+.notificationTextButton {
+    flex-grow: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 6px;
+    cursor: pointer;
+}
+
+.notificationTextSend {
+    background: url("./../img/send.svg") no-repeat center;
+    background-size: contain;
+}
+
+.notificationTextAbort {
+    background: url("./../img/abort.svg") no-repeat center;
+    background-size: contain;
+}
+
+
