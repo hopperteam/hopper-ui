@@ -29,7 +29,7 @@ function renderError(error: string) {
 
 function updateView(user: User, loadingController: LoadingController) {
     ReactDOM.render(
-        <MainView onClickLogout={navigateToLogin} user={user} 
+        <MainView onClickLogout={logout} user={user}
                   loadingController={loadingController} />,
         document.getElementById("root")
     );
@@ -41,6 +41,11 @@ function updateView(user: User, loadingController: LoadingController) {
 function updateLoop(user: User, loadingController: LoadingController) {
     setTimeout(() => updateLoop(user, loadingController), UPDATE_INTERVAL);
     updateView(user, loadingController);
+}
+
+function logout() {
+    SerializationUtil.deleteStoredSession();
+    SerializationUtil.navigateToLogout();
 }
 
 function navigateToLogin() {

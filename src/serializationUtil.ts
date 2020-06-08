@@ -46,4 +46,8 @@ export default class SerializationUtil {
     public static navigateToLogin() {
         document.location.assign(HopperApi.instanceLoginUrl + "?target=" + encodeURIComponent(window.location.href));
     }
+
+    public static navigateToLogout() {
+        document.location.assign(HopperApi.instanceLogoutUrl + "?target=" + encodeURIComponent(window.location.href));
+    }
 }
