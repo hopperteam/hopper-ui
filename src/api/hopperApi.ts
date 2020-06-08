@@ -36,7 +36,7 @@ export class HopperApi extends ApiBase implements IHopperApi {
                 try {
                     let info = JSON.parse(xhr.responseText);
                     this.instanceLoginUrl = info.loginUrl;
-                    this.instanceLoginUrl = info.logoutUrl;
+                    this.instanceLogoutUrl = info.logoutUrl;
                     this.instanceApiRot = info.apiRoot;
                     resolve();
                 } catch (e) {
