@@ -10,7 +10,6 @@
   position: absolute;
 }
 
-
 #loadingLogo {
   height: 72pt;
   animation-name: loading;
@@ -19,13 +18,12 @@
   animation-timing-function: linear;
 }
 
-
 @keyframes loading {
-  0%   { opacity: 1  }
-  10%  { opacity: .9 }
-  40%  { opacity: .4 }
-  50%  { opacity: .2 }
-  60%  { opacity: .4 }
-  90%  { opacity: .9 }
-  100% { opacity: 1  }
+  0%   { opacity: 1;  }
+  10%  { opacity: 0.9; }
+  40%  { opacity: 0.4; }
+  50%  { opacity: 0.2; }
+  60%  { opacity: 0.4; }
+  90%  { opacity: 0.9; }
+  100% { opacity: 1;  }
 }
