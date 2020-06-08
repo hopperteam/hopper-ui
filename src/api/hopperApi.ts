@@ -25,6 +25,7 @@ export interface IHopperApi {
 export class HopperApi extends ApiBase implements IHopperApi {
 
     static instanceLoginUrl: string = "";
+    static instanceLogoutUrl: string = "";
     static instanceApiRot: string = "";
 
     static loadInfo() {
@@ -34,8 +35,9 @@ export class HopperApi extends ApiBase implements IHopperApi {
             xhr.onload = () => {
                 try {
                     let info = JSON.parse(xhr.responseText);
-                    this.instanceLoginUrl = info.loginUrl
-                    this.instanceApiRot = info.apiRoot
+                    this.instanceLoginUrl = info.loginUrl;
+                    this.instanceLoginUrl = info.logoutUrl;
+                    this.instanceApiRot = info.apiRoot;
                     resolve();
                 } catch (e) {
                     resolve();
